@@ -28,7 +28,6 @@ stages:
         command: buildAndPush
         repository: azure-docker-test
         dockerfile: Dockerfile
-        containerRegistry: '{{ containerRegistryConnection.Id }}'
         tags: |
           latest
     
