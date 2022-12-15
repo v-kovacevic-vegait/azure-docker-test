@@ -22,6 +22,14 @@ stages:
       vmImage: ubuntu-latest
     steps:
     
+    - task: DockerCompose@0
+      inputs:
+        containerregistrytype: 'Container Registry'
+        dockerComposeFile: '**/docker-compose.yml'
+        dockerComposeFileArgs: 'DB_CONNECTION_STRING: "host=postgres;port=5432;database=mealforfamilydb;username=test;password=test"'
+        action: 'Run a Docker Compose command'
+        dockerComposeCommand: 'docker-compose up --build'
+
     - task: Docker@2
       displayName: Build an image
       inputs:
