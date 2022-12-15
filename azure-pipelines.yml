@@ -28,6 +28,7 @@ stages:
         containerRegistry: 'DockerHubConnection'
         command: 'buildAndPush'
         Dockerfile: '**/Dockerfile'
+        repository: 'verak13/mealforfamilytest'
         tags: |
           latest
     
