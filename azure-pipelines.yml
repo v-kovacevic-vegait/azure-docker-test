@@ -92,7 +92,7 @@ stages:
   variables:
     ConnectionStrings.DefaultConnection: $(ConnectionStringProd)
   displayName: Deploy to Prod
-  condition: contains(variables['Build.SourceBranch'], 'refs/heads/dev')
+  condition: contains(variables['Build.SourceBranch'], 'refs/heads/master')
   jobs:
     - deployment: DeployProd
       environment: PROD
@@ -121,31 +121,15 @@ stages:
                 custom: 'ef'
                 arguments: '--version'
                 
-            - task: DownloadBuildArtifacts@0
-              displayName: Download artifact
-              inputs:
-                buildType: 'current'
-                project: '474863c3-dee8-420d-b794-4679642f5427'
-                artifactName: 'drop'
-                buildVersionToDownload: 'latest'
-                downloadType: 'single'
-                downloadPath: '$(System.ArtifactsDirectory)'
-            
-            - task: FileTransform@1
-              displayName: 'File transformation: appsettings.json'
-              inputs:
-                folderPath: '$(System.ArtifactsDirectory)/**/*.zip'
-                fileType: 'json'
-                targetFiles: '**/appsettings.json'
-          
             - script: |
                 ls
                 dotnet-ef database update --connection "$(ConnectionStringProd)"
               displayName: 'Dotnet-ef database update'
                 
-            - task: AzureWebApp@1
+            
+            - task: AzureWebAppContainer@1
+              displayName: 'Azure Web App on Container Deploy'
               inputs:
                 azureSubscription: 'name'
-                appType: 'webAppLinux'
-                appName: 'azure-mealforfamily-test'
-                package: '$(System.ArtifactsDirectory)/**/*.zip'
+                appName: 'azure-mealforfamily-test-container'
+                imageName: 'verak13/mealforfamilytest:latest'
