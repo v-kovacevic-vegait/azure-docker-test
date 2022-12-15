@@ -28,7 +28,7 @@ stages:
         dockerComposeFile: '**/docker-compose.yml'
         dockerComposeFileArgs: 'DB_CONNECTION_STRING: "host=postgres;port=5432;database=mealforfamilydb;username=test;password=test"'
         action: 'Run a Docker Compose command'
-        dockerComposeCommand: 'docker-compose up --build'
+        dockerComposeCommand: 'up --build'
 
     - task: Docker@2
       displayName: Build an image
