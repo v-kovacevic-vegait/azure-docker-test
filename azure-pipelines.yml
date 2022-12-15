@@ -121,16 +121,9 @@ stages:
                 custom: 'ef'
                 arguments: '--version'
                 
-            - task: FileTransform@1
-              displayName: 'File transformation: appsettings.json'
-              inputs:
-                folderPath: '$(System.ArtifactsDirectory)/**/*.zip'
-                fileType: 'json'
-                targetFiles: '**/appsettings.json'
-                
             - script: |
                 ls
-                dotnet-ef database update --connection "$(ConnectionStringProd)"
+                dotnet-ef database update --connection "$(ConnectionStringDev)"
               displayName: 'Dotnet-ef database update'
                 
             
