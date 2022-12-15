@@ -28,7 +28,6 @@ stages:
         containerRegistry: 'DockerHubConnection'
         command: 'buildAndPush'
         Dockerfile: '**/Dockerfile'
-        repository: azure-docker-test
         tags: |
           latest
     
