@@ -109,11 +109,11 @@ stages:
                 dotnet-ef database update --connection "$(ConnectionStringDev)"
               displayName: 'Dotnet-ef database update'
                 
-            
+
             - task: AzureWebAppContainer@1
               displayName: 'Azure Web App on Container Deploy'
               inputs:
                 azureSubscription: 'name'
-                appName: 'azure-mealforfamily-test-container'
+                appName: 'zure-mealforfamily-test-container'
                 imageName: 'verak13/mealforfamilytest:latest'
-                multicontainerConfigFile: 'docker-compose.yml'
+                appSettings: '- ConnectionStrings__DefaultConnection $(ConnectionStringDev)'
