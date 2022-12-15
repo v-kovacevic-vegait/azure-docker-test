@@ -65,23 +65,6 @@ stages:
                 command: 'custom'
                 custom: 'ef'
                 arguments: '--version'
-                
-            - task: DownloadBuildArtifacts@0
-              displayName: Download artifact
-              inputs:
-                buildType: 'current'
-                project: '474863c3-dee8-420d-b794-4679642f5427'
-                artifactName: 'drop'
-                buildVersionToDownload: 'latest'
-                downloadType: 'single'
-                downloadPath: '$(System.ArtifactsDirectory)'
-            
-            - task: FileTransform@1
-              displayName: 'File transformation: appsettings.json'
-              inputs:
-                folderPath: '$(System.ArtifactsDirectory)/**/*.zip'
-                fileType: 'json'
-                targetFiles: '**/appsettings.json'
           
             - script: |
                 ls
