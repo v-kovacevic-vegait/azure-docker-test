@@ -22,14 +22,13 @@ stages:
       vmImage: ubuntu-latest
     steps:
 
-    
-
     - task: Docker@2
       displayName: Build and push an image to container registry
       inputs:
-        command: buildAndPush
+        containerRegistry: 'DockerHubConnection'
+        command: 'buildAndPush'
+        Dockerfile: '**/Dockerfile'
         repository: azure-docker-test
-        dockerfile: Dockerfile
         tags: |
           latest
     
