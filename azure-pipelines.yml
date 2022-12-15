@@ -26,7 +26,7 @@ stages:
       inputs:
         containerregistrytype: 'Container Registry'
         dockerComposeFile: '**/docker-compose.yml'
-        dockerComposeFileArgs: 'DB_CONNECTION_STRING: "host=postgres;port=5432;database=mealforfamilydb;username=test;password=test"'
+        dockerComposeFileArgs: 'DB_CONNECTION_STRING: "$(ConnectionStringDev)"'
         action: 'Run a Docker Compose command'
         dockerComposeCommand: 'up --build'
 
