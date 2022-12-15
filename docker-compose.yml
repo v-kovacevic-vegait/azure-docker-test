@@ -1,0 +1,18 @@
+version: '3.4'
+
+networks:
+  mealforfamily-dev:
+    driver: bridge 
+
+services:
+  mealforfamily:
+    image: mealforfamily:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8081:80"     
+    environment:
+      DB_CONNECTION_STRING: "host=postgres;port=5432;database=mealforfamilydb;username=test;password=test"
+    networks:
+      - mealforfamily-dev  

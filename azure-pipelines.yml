@@ -1,0 +1,157 @@
+# ASP.NET Core
+# Build and test ASP.NET Core projects targeting .NET Core.
+# Add steps that run tests, create a NuGet package, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+  branches:
+    include:
+    - master
+    - dev
+
+variables:
+  buildConfiguration: 'Release'
+
+stages:
+- stage: Build
+  displayName: Build and publish
+  jobs:  
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+
+    - script: dotnet build --configuration $(buildConfiguration)
+      displayName: 'Dotnet build $(buildConfiguration)'
+      
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'publish'
+        publishWebProjects: true
+        arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+      displayName: 'Publish'
+        
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
+      displayName: 'Publish artifact'
+
+- stage: Dev
+  variables:
+    ConnectionStrings.DefaultConnection: $(ConnectionStringDev)
+  displayName: Deploy to Dev
+  condition: contains(variables['Build.SourceBranch'], 'refs/heads/dev')
+  jobs:
+    - deployment: DeployDev
+      environment: DEV
+      pool:
+        vmImage: ubuntu-latest  
+
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - checkout: self
+            - task: DotNetCoreCLI@2
+              displayName: Install dotnet-ef
+              inputs:
+                command: 'custom'
+                custom: 'tool'
+                arguments: 'install --global dotnet-ef'
+
+            - script: dotnet tool restore
+              displayName: 'Dotnet tool restore'
+
+            - task: DotNetCoreCLI@2
+              displayName: Check dotnet-ef version
+              inputs:
+                command: 'custom'
+                custom: 'ef'
+                arguments: '--version'
+                
+            - task: DownloadBuildArtifacts@0
+              displayName: Download artifact
+              inputs:
+                buildType: 'current'
+                project: '474863c3-dee8-420d-b794-4679642f5427'
+                artifactName: 'drop'
+                buildVersionToDownload: 'latest'
+                downloadType: 'single'
+                downloadPath: '$(System.ArtifactsDirectory)'
+            
+            - task: FileTransform@1
+              displayName: 'File transformation: appsettings.json'
+              inputs:
+                folderPath: '$(System.ArtifactsDirectory)/**/*.zip'
+                fileType: 'json'
+                targetFiles: '**/appsettings.json'
+          
+            - script: |
+                ls
+                dotnet-ef database update --connection "$(ConnectionStringDev)"
+              displayName: 'Dotnet-ef database update'
+
+- stage: Prod
+  variables:
+    ConnectionStrings.DefaultConnection: $(ConnectionStringProd)
+  displayName: Deploy to Prod
+  condition: contains(variables['Build.SourceBranch'], 'refs/heads/master')
+  jobs:
+    - deployment: DeployProd
+      environment: PROD
+      pool:
+        vmImage: ubuntu-latest  
+
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - checkout: self
+            - task: DotNetCoreCLI@2
+              displayName: Install dotnet-ef
+              inputs:
+                command: 'custom'
+                custom: 'tool'
+                arguments: 'install --global dotnet-ef'
+
+            - script: dotnet tool restore
+              displayName: 'Dotnet tool restore'
+
+            - task: DotNetCoreCLI@2
+              displayName: Check dotnet-ef version
+              inputs:
+                command: 'custom'
+                custom: 'ef'
+                arguments: '--version'
+                
+            - task: DownloadBuildArtifacts@0
+              displayName: Download artifact
+              inputs:
+                buildType: 'current'
+                project: '474863c3-dee8-420d-b794-4679642f5427'
+                artifactName: 'drop'
+                buildVersionToDownload: 'latest'
+                downloadType: 'single'
+                downloadPath: '$(System.ArtifactsDirectory)'
+            
+            - task: FileTransform@1
+              displayName: 'File transformation: appsettings.json'
+              inputs:
+                folderPath: '$(System.ArtifactsDirectory)/**/*.zip'
+                fileType: 'json'
+                targetFiles: '**/appsettings.json'
+          
+            - script: |
+                ls
+                dotnet-ef database update --connection "$(ConnectionStringProd)"
+              displayName: 'Dotnet-ef database update'
+                
+            - task: AzureWebApp@1
+              inputs:
+                azureSubscription: 'name'
+                appType: 'webAppLinux'
+                appName: 'azure-mealforfamily-test'
+                package: '$(System.ArtifactsDirectory)/**/*.zip'
