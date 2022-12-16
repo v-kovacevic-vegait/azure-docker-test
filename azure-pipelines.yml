@@ -109,7 +109,7 @@ stages:
             - task: AzureWebAppContainer@1
               displayName: 'Azure Web App on Container Deploy'
               inputs:
-                azureSubscription: 'name'
+                azureSubscription: '$(ServiceConnection)'
                 appName: '$(AppServiceContainerNameProd)'
                 imageName: '$(DockerRepositoryProd):latest'
                 appSettings: '-ConnectionStrings__DefaultConnection "$(ConnectionStringProd)"'
