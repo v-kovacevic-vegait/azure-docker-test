@@ -28,14 +28,12 @@ stages:
         containerRegistry: 'DockerHubConnection'
         command: 'buildAndPush'
         Dockerfile: '**/Dockerfile'
-        repository: 'verak13/mealforfamilytest'
+        repository: '$(DockerRepositoryProd)'
         tags: |
           latest
     
 
 - stage: Dev
-  variables:
-    ConnectionStrings.DefaultConnection: $(ConnectionStringDev)
   displayName: Deploy to Dev
   condition: contains(variables['Build.SourceBranch'], 'refs/heads/dev')
   jobs:
@@ -72,8 +70,6 @@ stages:
               displayName: 'Dotnet-ef database update'
 
 - stage: Prod
-  variables:
-    ConnectionStrings.DefaultConnection: $(ConnectionStringProd)
   displayName: Deploy to Prod
   condition: contains(variables['Build.SourceBranch'], 'refs/heads/master')
   jobs:
@@ -106,7 +102,7 @@ stages:
                 
             - script: |
                 ls
-                dotnet-ef database update --connection "$(ConnectionStringDev)"
+                dotnet-ef database update --connection "$(ConnectionStringProd)"
               displayName: 'Dotnet-ef database update'
                 
 
@@ -114,6 +110,6 @@ stages:
               displayName: 'Azure Web App on Container Deploy'
               inputs:
                 azureSubscription: 'name'
-                appName: 'azure-mealforfamily-test-container'
-                imageName: 'verak13/mealforfamilytest:latest'
-                appSettings: '-ConnectionStrings__DefaultConnection "$(ConnectionStringDev)"'
+                appName: '$(AppServiceContainerNameProd)'
+                imageName: '$(DockerRepositoryProd):latest'
+                appSettings: '-ConnectionStrings__DefaultConnection "$(ConnectionStringProd)"'
