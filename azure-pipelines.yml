@@ -116,4 +116,4 @@ stages:
                 azureSubscription: 'name'
                 appName: 'azure-mealforfamily-test-container'
                 imageName: 'verak13/mealforfamilytest:latest'
-                appSettings: '- "ConnectionStrings__DefaultConnection" "$(ConnectionStringDev)"'
+                appSettings: '- "ConnectionStrings.DefaultConnection" "$(ConnectionStringDev)"'
