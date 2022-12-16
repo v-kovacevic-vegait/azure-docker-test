@@ -114,6 +114,6 @@ stages:
               displayName: 'Azure Web App on Container Deploy'
               inputs:
                 azureSubscription: 'name'
-                appName: 'zure-mealforfamily-test-container'
+                appName: 'azure-mealforfamily-test-container'
                 imageName: 'verak13/mealforfamilytest:latest'
                 appSettings: '- ConnectionStrings__DefaultConnection $(ConnectionStringDev)'
